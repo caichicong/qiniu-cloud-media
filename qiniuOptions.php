@@ -93,11 +93,11 @@ function qiniu_media_options_page_html() {
 
     if ( isset( $_GET['settings-updated'] ) ) {
         // add settings saved message with the class of "updated"
-        add_settings_error( 'wporg_messages', 'wporg_message', __( 'Settings Saved', 'wporg' ), 'updated' );
+        add_settings_error( 'qiniu_messages', 'qiniu_message', 'Settings Saved', 'updated' );
     }
 
     // show error/update messages
-    settings_errors( 'wporg_messages' );
+    settings_errors( 'qiniu_messages' );
 
     ?>
 

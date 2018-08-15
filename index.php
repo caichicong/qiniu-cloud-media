@@ -127,11 +127,11 @@ function qiniu_media_custom_columns( $column, $post_id ) {
 
 // 引入webuploader资源
 function load_weduploader_style() {
-    wp_register_style('webuploader_admin_css', plugins_url() . '/qiniu-media/webuploader/webuploader.css', false, '1.0.1' );
+    wp_register_style('webuploader_admin_css', plugins_url() . '/qiniu-cloud-media/webuploader/webuploader.css', false, '1.0.1' );
     wp_enqueue_style('webuploader_admin_css');
 
-    wp_enqueue_script( 'webuploader_script', plugins_url() . '/qiniu-media/webuploader/webuploader.html5only.min.js', array (), 1.2, false);
-    wp_enqueue_script( 'webuploader_upload_script', plugins_url() . '/qiniu-media/js/upload.js', array (), 1.11, true);
+    wp_enqueue_script( 'webuploader_script', plugins_url() . '/qiniu-cloud-media/webuploader/webuploader.html5only.min.js', array (), 1.2, false);
+    wp_enqueue_script( 'webuploader_upload_script', plugins_url() . '/qiniu-cloud-media/js/upload.js', array (), 1.11, true);
 }
 
 add_action( 'admin_enqueue_scripts', 'load_weduploader_style' );
@@ -238,7 +238,7 @@ function add_qiniu_meta_box(){
 add_action('add_meta_boxes', 'add_qiniu_meta_box');
 
 function qiniu_media_insert_button() {
-    wp_enqueue_script( 'insert_media_script', plugins_url() . '/qiniu-media/js/insertMedia.js', array (), 1.0, true);
+    wp_enqueue_script( 'insert_media_script', plugins_url() . '/qiniu-cloud-media/js/insertMedia.js', array (), 1.0, true);
 }
 
 add_action( 'admin_enqueue_scripts', 'qiniu_media_insert_button' );
