@@ -4,11 +4,9 @@
  * custom option and settings
  */
 
-define("QINIU_OPTIONS", 'qiniu_options');
-define("QINIU_OPTION_GROUP", 'qiniu');
 
 function qiniu_settings_init() {
-    register_setting( QINIU_OPTION_GROUP, QINIU_OPTIONS );
+    register_setting( QINIU_MEDIA_OPTION_GROUP, QINIU_MEDIA_OPTIONS );
 
     add_settings_section(
         'qiniu_section',
@@ -55,7 +53,7 @@ function qiniu_settings_init() {
 }
 
 function qiniu_field_cb($args) {
-    $options = get_option(QINIU_OPTIONS);
+    $options = get_option(QINIU_MEDIA_OPTIONS);
 
     $val = isset($options[$args['label_for']]) ? $options[$args['label_for']] : "" ;
 
@@ -75,7 +73,7 @@ function qiniu_section_cb() {
 
 function qiniu_media_options_page() {
     add_submenu_page(
-        'edit.php?post_type='. QINIU_POST_TYPE,
+        'edit.php?post_type='. QINIU_MEDIA_POST_TYPE,
         '七牛云参数设置',
         '参数设置',
         'manage_options',
@@ -104,7 +102,7 @@ function qiniu_media_options_page_html() {
     <div class="wrap">
         <form action="options.php" method="post">
             <?php
-            settings_fields( QINIU_OPTION_GROUP);
+            settings_fields( QINIU_MEDIA_OPTION_GROUP);
             do_settings_sections( 'qinu_media_option');
             submit_button( 'Save Settings' );
             ?>

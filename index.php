@@ -13,19 +13,18 @@ include __DIR__ . '/vendor/autoload.php';
 use Qiniu\Storage\UploadManager;
 use Qiniu\Auth;
 
-error_reporting(-1);
-ini_set('display_errors', 1);
-
 defined( 'ABSPATH' ) or die( 'Nope, not accessing this' );
 
-define("QINIU_POST_TYPE", "qiniu_media");
+define("QINIU_MEDIA_POST_TYPE", "qiniu_media");
+define("QINIU_MEDIA_OPTIONS", 'qiniu_options');
+define("QINIU_MEDIA_OPTION_GROUP", 'qiniu');
 include __DIR__ . '/qiniuOptions.php';
 
-$options = get_option(QINIU_OPTIONS);
+$options = get_option(QINIU_MEDIA_OPTIONS);
 
-define("QINIU_ACCESS_KEY", $options['access_key']);
-define("QINIU_SECRET_KEY", $options['secret_key']);
-define("QINIU_DOMAIN", $options['cdn_domain']);
+define("QINIU_MEDIA_ACCESS_KEY", $options['access_key']);
+define("QINIU_MEDIA_SECRET_KEY", $options['secret_key']);
+define("QINIU_MEDIA_DOMAIN", $options['cdn_domain']);
 
 function get_posts_with_count($args) {
 
@@ -48,7 +47,7 @@ add_action( 'admin_menu', 'my_admin_menu' );
 
 function my_admin_menu() {
     add_submenu_page(
-        'edit.php?post_type='. QINIU_POST_TYPE,
+        'edit.php?post_type='. QINIU_MEDIA_POST_TYPE,
         '七牛云文件批量上传',
         '批量上传',
         'upload_files',
@@ -106,7 +105,7 @@ function qiniu_media_custom_post_type() {
         'publicly_queryable'    => true,
         'capability_type'       => 'page',
     );
-    register_post_type( QINIU_POST_TYPE, $args );
+    register_post_type( QINIU_MEDIA_POST_TYPE, $args );
 }
 add_action( 'init', 'qiniu_media_custom_post_type', 0 );
 
@@ -114,14 +113,14 @@ function add_qiniu_media_columns($columns) {
     return array_merge($columns,
         array('thumbnail' => "缩略图"));
 }
-add_filter('manage_' . QINIU_POST_TYPE . '_posts_columns' , 'add_qiniu_media_columns');
+add_filter('manage_' . QINIU_MEDIA_POST_TYPE . '_posts_columns' , 'add_qiniu_media_columns');
 
 add_action( 'manage_posts_custom_column' , 'qiniu_media_custom_columns', 10, 2 );
 
 function qiniu_media_custom_columns( $column, $post_id ) {
     if($column == "thumbnail") {
         $key = get_post_meta($post_id, "key", true);
-        printf("<img src='%s/%s?%s' />", "http://" . QINIU_DOMAIN, $key, 'imageView2/1/w/70/h/70/format/jpg/q/75|imageslim');
+        printf("<img src='%s/%s?%s' />", "http://" . QINIU_MEDIA_DOMAIN, $key, 'imageView2/1/w/70/h/70/format/jpg/q/75|imageslim');
     }
 }
 
@@ -183,7 +182,7 @@ add_action( 'wp_ajax_get_qiniu_image_list', 'get_qiniu_image_list');
 function qiniu_upload_action() {
     $upManager = new UploadManager();
     $bucketName = "videoplugintest";
-    $auth = new Auth(QINIU_ACCESS_KEY, QINIU_SECRET_KEY);
+    $auth = new Auth(QINIU_MEDIA_ACCESS_KEY, QINIU_MEDIA_SECRET_KEY);
     $token = $auth->uploadToken($bucketName);
 
     $tmpFilePath = $_FILES['file']['tmp_name'];
@@ -192,7 +191,7 @@ function qiniu_upload_action() {
     $my_post = array();
     $my_post['post_title']    = $_FILES['file']['name'];
     $my_post['post_content']  = '';
-    $my_post['post_type'] = QINIU_POST_TYPE;
+    $my_post['post_type'] = QINIU_MEDIA_POST_TYPE;
     $my_post['post_status']   = 'publish';
     $my_post['post_author']   = get_current_user_id();
     $my_post['post_category'] = array(0);
@@ -217,7 +216,7 @@ add_action( 'wp_ajax_qiniu_upload_action', 'qiniu_upload_action');
 // shortcode
 function qiniu_image_shortcode( $atts ) {
     $key = get_post_meta($atts['id'], "key", true);
-    $src = "http://" . QINIU_DOMAIN . '/' . $key;
+    $src = "http://" . QINIU_MEDIA_DOMAIN . '/' . $key;
 
     if(!empty($atts['action'])) {
         $src = $src . "?" . $atts['action'];
