@@ -5,7 +5,7 @@
  */
 
 
-function qiniu_settings_init() {
+function qiniu_media_settings_init() {
     register_setting( QINIU_MEDIA_OPTION_GROUP, QINIU_MEDIA_OPTIONS );
 
     add_settings_section(
@@ -62,7 +62,7 @@ function qiniu_field_cb($args) {
     <?php
 }
 
-add_action( 'admin_init', 'qiniu_settings_init' );
+add_action( 'admin_init', 'qiniu_media_settings_init' );
 
 function qiniu_section_cb() {
     ?>

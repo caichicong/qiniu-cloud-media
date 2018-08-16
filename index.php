@@ -26,7 +26,7 @@ define("QINIU_MEDIA_ACCESS_KEY", $options['access_key']);
 define("QINIU_MEDIA_SECRET_KEY", $options['secret_key']);
 define("QINIU_MEDIA_DOMAIN", $options['cdn_domain']);
 
-function get_posts_with_count($args) {
+function qiniu_media_get_posts_with_count($args) {
 
     $wp_query = new WP_Query( $args );
     $return = ["count" => 0, "data" => []];
@@ -43,9 +43,7 @@ function qiniu_batch_upload_page() {
     include __DIR__ . '/pages/batchUpload.php';
 }
 
-add_action( 'admin_menu', 'my_admin_menu' );
-
-function my_admin_menu() {
+function qiniu_media_batch_upload_menu() {
     add_submenu_page(
         'edit.php?post_type='. QINIU_MEDIA_POST_TYPE,
         '七牛云文件批量上传',
@@ -55,6 +53,10 @@ function my_admin_menu() {
         'qiniu_batch_upload_page'
     );
 }
+
+add_action( 'admin_menu', 'qiniu_media_batch_upload_menu' );
+
+
 
 function qiniu_media_custom_post_type() {
     $labels = array(
@@ -109,11 +111,11 @@ function qiniu_media_custom_post_type() {
 }
 add_action( 'init', 'qiniu_media_custom_post_type', 0 );
 
-function add_qiniu_media_columns($columns) {
+function qiniu_media_add_columns($columns) {
     return array_merge($columns,
         array('thumbnail' => "缩略图"));
 }
-add_filter('manage_' . QINIU_MEDIA_POST_TYPE . '_posts_columns' , 'add_qiniu_media_columns');
+add_filter('manage_' . QINIU_MEDIA_POST_TYPE . '_posts_columns' , 'qiniu_media_add_columns');
 
 add_action( 'manage_posts_custom_column' , 'qiniu_media_custom_columns', 10, 2 );
 
@@ -125,7 +127,7 @@ function qiniu_media_custom_columns( $column, $post_id ) {
 }
 
 // 引入webuploader资源
-function load_weduploader_style() {
+function qiniu_media_load_weduploader_style() {
     wp_register_style('webuploader_admin_css', plugins_url() . '/qiniu-cloud-media/webuploader/webuploader.css', false, '1.0.1' );
     wp_enqueue_style('webuploader_admin_css');
 
@@ -133,23 +135,23 @@ function load_weduploader_style() {
     wp_enqueue_script( 'webuploader_upload_script', plugins_url() . '/qiniu-cloud-media/js/upload.js', array (), 1.11, true);
 }
 
-add_action( 'admin_enqueue_scripts', 'load_weduploader_style' );
+add_action( 'admin_enqueue_scripts', 'qiniu_media_load_weduploader_style' );
 
-function get_media_categories() {
+function get_qiniu_media_categories() {
     $mediaCategories = get_categories('taxonomy=category&post_type=qiniu_media');
     header( "Content-Type: application/json");
     echo json_encode($mediaCategories);
     wp_die();
 }
-add_action( 'wp_ajax_get_media_categories', 'get_media_categories');
+add_action( 'wp_ajax_get_media_categories', 'get_qiniu_media_categories');
 
-function get_qiniu_image_list() {
+function get_qiniu_media_image_list() {
     $catid = intval($_POST['catid']);
     $pagesize = 10;
     $page = intval($_POST['page']);
     $offset = ($page - 1) * $pagesize;
 
-    $result = get_posts_with_count(array(
+    $result = qiniu_media_get_posts_with_count(array(
         'offset'=> $offset,
         'post_type' => 'qiniu_media',
         'posts_per_page' => $pagesize,
@@ -177,9 +179,9 @@ function get_qiniu_image_list() {
     echo json_encode(["imgs" => $imageList, "pagecount" => ceil($result['count'] / $pagesize) ]);
     wp_die();
 }
-add_action( 'wp_ajax_get_qiniu_image_list', 'get_qiniu_image_list');
+add_action( 'wp_ajax_get_qiniu_image_list', 'get_qiniu_media_image_list');
 
-function qiniu_upload_action() {
+function qiniu_media_upload_action() {
     $upManager = new UploadManager();
     $bucketName = "videoplugintest";
     $auth = new Auth(QINIU_MEDIA_ACCESS_KEY, QINIU_MEDIA_SECRET_KEY);
@@ -211,7 +213,7 @@ function qiniu_upload_action() {
 
     wp_die();
 }
-add_action( 'wp_ajax_qiniu_upload_action', 'qiniu_upload_action');
+add_action( 'wp_ajax_qiniu_upload_action', 'qiniu_media_upload_action');
 
 // shortcode
 function qiniu_image_shortcode( $atts ) {
